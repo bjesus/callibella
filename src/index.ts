@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { callibellaConfig } from './models'
 import { maskEvent } from './utils'
 import { DAVClient } from 'tsdav'

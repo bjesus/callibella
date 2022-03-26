@@ -1,18 +1,11 @@
 {
   "name": "callibella",
-  "version": "1.0.0",
+  "version": "0.9.1",
   "description": "Callibella",
   "author": "",
   "main": "index.ts",
   "bin": {
-    "callibella": "./dist/index.js"
-  },
-  "scripts": {
-    "start": "npx ts-node src/index.ts",
-    "build": "tsc -p .",
-    "install": "npm i -g",
-    "local": "callibella",
-    "refresh": "rm -rf ./node_modules ./package-lock.json && npm install"
+    "callibella": "./index.js"
   },
   "eslintConfig": {
     "root": true,
@@ -33,6 +26,7 @@
   },
   "dependencies": {
     "node-ical": "^0.14.1",
+    "ts-node": "^10.7.0",
     "tsdav": "^2.0.0"
   },
   "license": "MIT"
