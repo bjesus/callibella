@@ -1,12 +1,11 @@
 {
   "name": "callibella",
-  "version": "0.9.4",
+  "version": "0.9.20",
   "description": "Calendar syncing monkey",
+  "type": "module",
   "author": "Yo'av Moshe",
   "main": "index.ts",
-  "bin": {
-    "callibella": "./index.js"
-  },
+  "bin": "./index.js",
   "eslintConfig": {
     "root": true,
     "extends": [
@@ -15,18 +14,12 @@
     ]
   },
   "devDependencies": {
-    "@types/node": "^17.0.21",
-    "@typescript-eslint/eslint-plugin": "^4.16.1",
-    "@typescript-eslint/parser": "^4.16.1",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^8.1.0",
-    "eslint-config-typescript": "^3.0.0",
-    "prettier": "^2.3.0",
-    "typescript": "^4.3.2"
+    "prettier": "^2.3.0"
   },
   "dependencies": {
     "node-ical": "^0.14.1",
-    "ts-node": "^10.7.0",
     "tsdav": "^2.0.0"
   },
   "keywords": [

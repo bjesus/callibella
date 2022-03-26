@@ -1,4 +1,4 @@
-export const maskEvent = (data: string): string => {
+export const maskEvent = (data) => {
   return data
     .replace(/SUMMARY.*/, 'SUMMARY:Busy\n')
     .replace(/DESCRIPTION.*/, 'DESCRIPTION:Created by Callibella 🐒\n')
