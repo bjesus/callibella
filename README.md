@@ -52,8 +52,6 @@ Callibella makes heavy use of [tsdav](https://github.com/natelindev/tsdav/) to c
 
 ## Usage
 
-1. Install Callibella using `npm install -g callibella`
-2. Make sure your ~/.config/callibella/config.json file is configured
-3. Run using `callibella`
-
-Use your own cron system to call Callibella every X minutes and it will keep your calendars in sync forever.
+1. Configure your calendars as explained above and save the file at `~/.config/callibella/config.json`
+2. Run `npx callibella` to start syncing without installation, or install it using `npm install -g callibella` and then use `callibella`
+3. Everything works? Add a cron job for it and have your calendars forever synced!
