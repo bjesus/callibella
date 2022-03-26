@@ -5,15 +5,19 @@ import ical from 'node-ical'
 import { readFileSync, existsSync } from 'fs'
 import { homedir } from 'os'
 
+console.log('Callibella 🐒 Your calendar syncing monkey!\n')
+
 const configFile = homedir() + '/.config/callibella/config.json'
 if (!existsSync(configFile)) {
   console.error('Configuration file not found at:', configFile)
+  console.error('Please create one before running Callibella')
   process.exit(1)
 }
+
 const rawConfig = readFileSync(configFile)
 const config: callibellaConfig = JSON.parse(rawConfig.toString())
 
-const summary = { Added: 0, Deleted: 0, Updated: 0 }
+const summary = { added: 0, deleted: 0, updated: 0 }
 const start = new Date()
 const end = new Date()
 const timeRange = {
@@ -26,9 +30,10 @@ const timeRange = {
 ;(async () => {
   const sourceClient = new DAVClient(config.source.connection)
   const destinationClient = new DAVClient(config.destination.connection)
-
+  console.log(':: Connecting to calendars...')
   await Promise.all([sourceClient.login(), destinationClient.login()])
 
+  console.log(':: Getting events...')
   const sourceCalendar = (await sourceClient.fetchCalendars()).filter(
     (cal) => cal.displayName === config.source.calendar,
   )[0]
@@ -50,6 +55,7 @@ const timeRange = {
     })
   ).filter((event) => event.data?.includes('Created by Callibella'))
 
+  console.log(':: Comparing events to sync...')
   for (const event of destinationEvents) {
     const parsedEvent = Object.entries(ical.sync.parseICS(event.data)).filter(
       (x) => x[1].type === 'VEVENT',
@@ -64,14 +70,15 @@ const timeRange = {
 
     // Delete from destination if it doesn't exist
     if (!sourceMatch.length) {
+      process.stdout.write(':: Deleting destination event without a match... ')
       const res = await destinationClient.deleteCalendarObject({
         calendarObject: {
           url: event.url,
           etag: event.etag,
         },
       })
-      console.log('Event deletion result:', res.status)
-      summary.Deleted++
+      console.log(res.status)
+      summary.deleted++
       continue
     }
 
@@ -89,6 +96,9 @@ const timeRange = {
         parsedSourceMatch.end.toString() !== parsedEvent.end.toString())
     ) {
       // adjust time
+      process.stdout.write(
+        `:: Updating destination event based on "${parsedSourceMatch.summary}"... `,
+      )
       const res = await destinationClient.updateCalendarObject({
         calendarObject: {
           data: maskEvent(sourceMatch[0].data),
@@ -96,21 +106,31 @@ const timeRange = {
           etag: event.etag,
         },
       })
-      console.log('Event updating result:', res.status)
-      summary.Updated++
+      console.log(res.status)
+      summary.updated++
     }
     // Remove from sourceEvents after processing
     sourceEvents = sourceEvents.filter((event) => !event.data.includes(uid))
   }
   //
   for (const event of sourceEvents.filter((event) => event.data)) {
+    const parsedSourceMatch = Object.entries(
+      ical.sync.parseICS(event.data),
+    ).filter((x) => x[1].type === 'VEVENT')[0][1]
+
+    process.stdout.write(
+      `:: Creating new destination event based on "${parsedSourceMatch.summary}"... `,
+    )
     const res = await destinationClient.createCalendarObject({
       calendar: destinationCalendar,
       filename: 'not used',
       iCalString: maskEvent(event.data),
     })
-    console.log('Event creation result:', res.status)
-    summary.Added++
+    console.log(res.status)
+    summary.added++
   }
-  console.table(summary)
+  console.log(`\nNew events: ${summary.added}`)
+  console.log(`Updated events: ${summary.updated}`)
+  console.log(`Deleted events: ${summary.deleted}`)
+  console.log('\nDone working, going to have a banana 🍌')
 })()
